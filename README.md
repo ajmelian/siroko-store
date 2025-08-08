@@ -1,4 +1,4 @@
-# Siroko Cart & Checkout API
+# Cart & Checkout API
 
 API desacoplada para la gestión de carrito de compra y proceso de checkout.  
 Arquitectura Hexagonal, DDD y CQRS, desarrollada sobre Symfony 7.
