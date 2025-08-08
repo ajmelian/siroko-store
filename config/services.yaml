@@ -1,0 +1,46 @@
+services:
+    App\Cart\Infrastructure\Persistence\InMemoryCartRepository:
+        public: true
+
+    App\Cart\Domain\CartRepositoryInterface: '@App\Cart\Infrastructure\Persistence\InMemoryCartRepository'
+
+    App\Order\Infrastructure\Persistence\InMemoryOrderRepository:
+        public: true
+
+    App\Order\Domain\OrderRepositoryInterface: '@App\Order\Infrastructure\Persistence\InMemoryOrderRepository'
+
+    App\Cart\Application\Handler\AddProductToCartHandler:
+        arguments:
+            $cartRepository: '@App\Cart\Domain\CartRepositoryInterface'
+
+    App\Cart\Application\Handler\GetCartItemsHandler:
+        arguments:
+            $cartRepository: '@App\Cart\Domain\CartRepositoryInterface'
+
+    App\Cart\Application\Handler\UpdateProductQuantityHandler:
+        arguments:
+            $cartRepository: '@App\Cart\Domain\CartRepositoryInterface'
+
+    App\Cart\Application\Handler\RemoveProductFromCartHandler:
+        arguments:
+            $cartRepository: '@App\Cart\Domain\CartRepositoryInterface'
+
+    App\Cart\Application\Handler\CheckoutCartHandler:
+        arguments:
+            $cartRepository: '@App\Cart\Domain\CartRepositoryInterface'
+            $orderRepository: '@App\Order\Domain\OrderRepositoryInterface'
+
+    App\Cart\Infrastructure\Controller\CartController:
+        arguments:
+            $addProductToCartHandler: '@App\Cart\Application\Handler\AddProductToCartHandler'
+            $updateProductQuantityHandler: '@App\Cart\Application\Handler\UpdateProductQuantityHandler'
+            $removeProductFromCartHandler: '@App\Cart\Application\Handler\RemoveProductFromCartHandler'
+            $getCartItemsHandler: '@App\Cart\Application\Handler\GetCartItemsHandler'
+            $checkoutCartHandler: '@App\Cart\Application\Handler\CheckoutCartHandler'
+        tags: ['controller.service_arguments']
+
+    App\Order\Infrastructure\Controller\OrderController:
+        arguments:
+            $orderRepository: '@App\Order\Domain\OrderRepositoryInterface'
+        tags: ['controller.service_arguments']
+

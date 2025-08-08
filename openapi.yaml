@@ -1,0 +1,229 @@
+openapi: 3.0.0
+info:
+  title: Siroko Cart & Checkout API
+  version: "1.0.0"
+  description: |
+    API para la gestión de carrito de compra y generación de órdenes. Arquitectura Hexagonal, CQRS y desacoplada de la UI.
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/cart/{cartId}/items:
+    post:
+      summary: Añadir producto al carrito
+      tags: [Cart]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productId, quantity]
+              properties:
+                productId:
+                  type: string
+                  example: sku123
+                quantity:
+                  type: integer
+                  example: 2
+      parameters:
+        - in: path
+          name: cartId
+          schema:
+            type: string
+          required: true
+          description: Identificador del carrito
+      responses:
+        '200':
+          description: Producto añadido correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+        '400':
+          description: Faltan parámetros requeridos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+    get:
+      summary: Listar productos del carrito
+      tags: [Cart]
+      parameters:
+        - in: path
+          name: cartId
+          schema:
+            type: string
+          required: true
+          description: Identificador del carrito
+      responses:
+        '200':
+          description: Lista de productos en el carrito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        productId:
+                          type: string
+                        quantity:
+                          type: integer
+  /api/cart/{cartId}/items/{productId}:
+    put:
+      summary: Actualizar cantidad de un producto (vía path)
+      tags: [Cart]
+      parameters:
+        - in: path
+          name: cartId
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: productId
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [quantity]
+              properties:
+                quantity:
+                  type: integer
+                  example: 3
+      responses:
+        '200':
+          description: Cantidad actualizada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+        '400':
+          description: Cantidad no válida
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+    delete:
+      summary: Eliminar producto del carrito (vía path)
+      tags: [Cart]
+      parameters:
+        - in: path
+          name: cartId
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: productId
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Producto eliminado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+        '404':
+          description: Producto no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /api/cart/{cartId}/checkout:
+    post:
+      summary: Procesar el pago y generar orden
+      tags: [Checkout]
+      parameters:
+        - in: path
+          name: cartId
+          schema:
+            type: string
+          required: true
+          description: Identificador del carrito
+      responses:
+        '200':
+          description: Checkout completado y orden generada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  message:
+                    type: string
+                    example: Checkout completado
+        '404':
+          description: Carrito no encontrado o vacío
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /api/orders:
+    get:
+      summary: Listar todas las órdenes generadas
+      tags: [Order]
+      responses:
+        '200':
+          description: Lista de órdenes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        orderId:
+                          type: string
+                        cartId:
+                          type: string
+                        products:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              productId:
+                                type: string
+                              quantity:
+                                type: integer
+                        createdAt:
+                          type: string
+                          example: 2025-08-06 15:11:00
+
